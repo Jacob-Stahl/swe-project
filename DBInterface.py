@@ -31,7 +31,7 @@ def sendSQL(sqlString, createID = False):
     ) as tunnel:
         # login to mysql
         connection = pymysql.connect(
-            user='brokenbits', passwd='usbrocketlauncher99',
+            user='dbaccess', passwd='softeng3365',
             host='127.0.0.1', port=tunnel.local_bind_port,
             db='healthcare',
         )
