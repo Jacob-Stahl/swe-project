@@ -5,6 +5,12 @@ import hashlib
 sshtunnel.SSH_TIMEOUT = 5.0
 sshtunnel.TUNNEL_TIMEOUT = 5.0
 
+
+
+#def addAppointment(patient_name, patient_birthday, date, time):
+
+
+
 # Adds a new row to patient table in database
 def addPatient(name, address, city, state, zip_code, phone_no = None, email = None, social = None, insurance = None):
     patient_id = genID(name + address)
@@ -46,3 +52,4 @@ def genID(hashString):
     newID = hashlib.sha1(hashString.encode("UTF-8")).hexdigest()
     newID = newID[:10]
     return(newID)
+    
