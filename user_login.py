@@ -4,6 +4,27 @@ import hashlib
 __name__ = 'user_login'
 
 
+
+# -------HOW TO USE--------
+# import this module w/ "import user_login"
+# set currentUser = login(username, password)
+# login queries are a lil slow thanks to those uber secure 256-bit hashes
+# Failed logins will set currentUser to an error code:
+#   currentUser == "PW" means incorrect password was entered
+#   currentUser == "USR" means username was not found
+# currentUser has 3 attributes:
+#   currentUser.name: employee name
+#   currentUser.employee_id: employee id as stored in DB
+#   currentUser.classification: employee position, either 'doctor', 'nurse', or 'clerk'
+# User currentUser.classification to determine what menus to pull up on login
+
+# Test logins:
+#   username        password
+#   'testDoctor'     'softeng3365'
+#   'testNurse'      'softeng3365'
+#   'testClerk'      'softeng3365
+
+
 # Function to login using hashed passwords in employee table on DB
 def login(username, password):
     # Fetch info on employee attempting to login
