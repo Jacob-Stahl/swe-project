@@ -9,24 +9,46 @@ sshtunnel.TUNNEL_TIMEOUT = 5.0
 
 
 # Create a new appointment entry in DB
-# Not finished!!
+# Includes preventative measures for duplicate entries
 def addAppointment(patient_name, patient_birthday, gender, date, time):
+    successfulInsert = False
     apt_id = genID(date + time)
-    getPatientSQL = "SELECT patient_id FROM patient WHERE patient_name = '" + patient_name + \
-        "AND birthday = " + patient_birthday + "';"
-    patient_id = sendSQL(getPatientSQL)
-    # set patient id if patient already exists in database
-    if len(patient_id == 1):
-        patient_id = patient_id[0]
-    # create new patient record if patient does not exist in database
-    elif len(patient_id == 0):
-        patient_id = addPatient(patient_name, patient_birthday, gender=gender)
-    # throw exception if multiple patients w/ same name & birthday found
-    else:
-        raise LookupError('Multiple Patients exist with provided name and birthday')
+    # while loop avoids conflicting apt_id hashes
+    while successfulInsert == False:
+        try:
+            getPatientSQL = "SELECT patient_id FROM patient WHERE patient_name = '" + patient_name + \
+                "' AND birthday = '" + patient_birthday + "';"
+            patient_id = sendSQL(getPatientSQL)
+            # create new patient record if patient does not exist in database
+            if patient_id == None:
+                print(patient_id == None)
+                print(patient_id)
+                patient_id = addPatient(patient_name, patient_birthday, gender=gender)
+            # set patient id if patient already exists in database
+            elif len(patient_id) == 1:
+                patient_id = patient_id[0]
+            # throw exception if multiple patients w/ same name & birthday found
+            else:
+                raise LookupError('Multiple patients exist with provided name and birthday.')
+            # Create SQL statement to add appointment to DB
+            addAppSQL = "INSERT INTO appointment (apt_id, patient_id, patient_name, date, time) \
+                VALUES ('" + apt_id + "', '" + patient_id + "', '" + patient_name + "', '" + date + "', '" + time + "');"
+            sendSQL(addAppSQL)
+            successfulInsert = True
+        # catches duplicate entries and conflicting hashes
+        except pymysql.err.IntegrityError:
+            # differentiates duplicate entries from conflicting hashes
+            if str(sendSQL("SELECT date FROM appointment WHERE apt_id = '" + apt_id + "';")[0]) != date:
+                apt_id = genID(apt_id)
+            else:
+                # returns 'None' if appointment already exists for provided date and time
+                return None
+    return apt_id
+
     
 
 # Adds a new row to patient table in database
+# No preventative measures for duplicate entries
 def addPatient(name, birthday, gender = None, address = None, city = None, state = None, zip_code = None, \
     phone_no = None, email = None, social = None, insurance = None):
 
@@ -48,7 +70,7 @@ def addPatient(name, birthday, gender = None, address = None, city = None, state
         # Generate new patient_id if conflict
         except pymysql.err.IntegrityError:
             patient_id = genID(patient_id)
-    # Return patiend id as confirmation
+    # Return patient id as confirmation
     return patient_id
 
 
@@ -56,7 +78,7 @@ def addPatient(name, birthday, gender = None, address = None, city = None, state
 def sendSQL(sqlString, createID = False):
     # login to ssh
     with sshtunnel.SSHTunnelForwarder(
-        ('193.27.13.94', 4067),
+        ('193.27.13.58', 4067),
         ssh_username='dbaccess', ssh_password='softeng3365',
         remote_bind_address=('127.0.0.1', 3306)
     ) as tunnel:
