@@ -21,8 +21,6 @@ def addAppointment(patient_name, patient_birthday, gender, date, time):
             patient_id = sendSQL(getPatientSQL)
             # create new patient record if patient does not exist in database
             if patient_id == None:
-                print(patient_id == None)
-                print(patient_id)
                 patient_id = addPatient(patient_name, patient_birthday, gender=gender)
             # set patient id if patient already exists in database
             elif len(patient_id) == 1:
