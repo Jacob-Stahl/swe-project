@@ -21,8 +21,6 @@ def addAppointment(patient_name, patient_birthday, gender, date, time):
             patient_id = sendSQL(getPatientSQL)
             # create new patient record if patient does not exist in database
             if patient_id == None:
-                print(patient_id == None)
-                print(patient_id)
                 patient_id = addPatient(patient_name, patient_birthday, gender=gender)
             # set patient id if patient already exists in database
             elif len(patient_id) == 1:
@@ -78,7 +76,7 @@ def addPatient(name, birthday, gender = None, address = None, city = None, state
 def sendSQL(sqlString, createID = False):
     # login to ssh
     with sshtunnel.SSHTunnelForwarder(
-        ('193.27.13.58', 4067),
+        ('193.27.13.69', 4067),
         ssh_username='dbaccess', ssh_password='softeng3365',
         remote_bind_address=('127.0.0.1', 3306)
     ) as tunnel:
