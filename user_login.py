@@ -3,8 +3,6 @@ import hashlib
 
 __name__ = 'user_login'
 
-
-
 # -------HOW TO USE--------
 # import this module w/ "import user_login"
 # set currentUser = login(username, password)
@@ -26,7 +24,7 @@ __name__ = 'user_login'
 
 
 # Function to login using hashed passwords in employee table on DB
-def login(username, password):
+def loginUser(username, password):
     # Fetch info on employee attempting to login
     emp_info = DBInterface.sendSQL("SELECT * FROM employee WHERE username = '" + username + "';")
     # If employee was found in DB
@@ -45,7 +43,6 @@ def login(username, password):
     # User not found
     else:
         return "USR"
-
 
 # User object providing basic info on user currently logged in
 # Can be used to determine what interfaces to bring up

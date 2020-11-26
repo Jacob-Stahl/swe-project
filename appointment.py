@@ -8,16 +8,7 @@ except ImportError:
     from tkinter import *
     import tkinter as tk
     
-import sqlite3
 import tkinter.messagebox
-
-# connect to the databse.
-conn = sqlite3.connect('database.db')
-# cursor to move in the database
-c = conn.cursor()
-
-# empty list to later appends the ids from the database
-ids = []
 
 # tkinter window
 class App:
@@ -36,8 +27,8 @@ class App:
         self.heading.place(x=220, y=50)
 
         # patient's name
-        self.name = Label(self.left, text="Patient's Name", font=('arial 12'), fg='black', bg='lightblue')
-        self.name.place(x=65, y=100)
+        self.patientName = Label(self.left, text="Patient's Name", font=('arial 12'), fg='black', bg='lightblue')
+        self.patientName.place(x=65, y=100)
 
         # age
         self.age = Label(self.left, text="Age", font=('arial 12'), fg='black', bg='lightblue')
@@ -47,25 +38,21 @@ class App:
         self.gender = Label(self.left, text="Gender", font=('arial 12'), fg='black', bg='lightblue')
         self.gender.place(x=65, y=180)
 
-        # location
-        self.location = Label(self.left, text="Location", font=('arial 12'), fg='black', bg='lightblue')
-        self.location.place(x=65, y=220)
-
         # Doctor's name
         self.docName = Label(self.left, text="Doctor's Name", font=('arial 12'), fg='black', bg='lightblue')
-        self.docName.place(x=65, y=260)
+        self.docName.place(x=65, y=220)
+
+        # appointment date
+        self.appointmentDate = Label(self.left, text="Appointment Date", font=('arial 12'), fg='black', bg='lightblue')
+        self.appointmentDate.place(x=65, y=260)
 
         # appointment time
-        self.time = Label(self.left, text="Appointment Time (HH:MM)", font=('arial 12'), fg='black', bg='lightblue')
-        self.time.place(x=65, y=300)
-
-        # phone
-        self.phone = Label(self.left, text="Phone Number", font=('arial 12'), fg='black', bg='lightblue')
-        self.phone.place(x=65, y=340)
+        self.appointmentTime = Label(self.left, text="Appointment Time (HH:MM)", font=('arial 12'), fg='black', bg='lightblue')
+        self.appointmentTime.place(x=65, y=300)
 
         # Enteries for all labels==============================================================
-        self.name_ent = Entry(self.left, width=30)
-        self.name_ent.place(x=275, y=100)
+        self.patientName = Entry(self.left, width=30)
+        self.patientName.place(x=275, y=100)
 
         self.age_ent = Entry(self.left, width=30)
         self.age_ent.place(x=275, y=140)
@@ -90,27 +77,23 @@ class App:
         
         self.var.trace("w", callback)
 
-        self.location_ent = Entry(self.left, width=30)
-        self.location_ent.place(x=275, y=220)
-
-
         self.doc_name_ent = Entry(self.left, width=30)
-        self.doc_name_ent.place(x=275, y=260)
+        self.doc_name_ent.place(x=275, y=220)
+
+        self.appointmentDate = Entry(self.left, width=30)
+        self.appointmentDate.place(x=275, y=260)
 
         self.time_ent = Entry(self.left, width=30)
         self.time_ent.place(x=275, y=300)
 
-        self.phone_ent = Entry(self.left, width=30)
-        self.phone_ent.place(x=275, y=340)
-
         # button to perform a command
         self.submit = Button(self.left, text="Add Appointment", width=20, height=2, bg='steelblue', command=self.add_appointment)
-        self.submit.place(x=190, y=400)
+        self.submit.place(x=220, y=400)
 
     # function to call when the submit button is clicked
     def add_appointment(self, event):
         # getting the user inputs
-        self.val1 = self.name_ent.get()
+        self.val1 = self.patientName.get()
         self.val2 = self.age_ent.get()
         self.val3 = self.gender_ent
         self.val4 = self.location_ent.get()
@@ -122,14 +105,9 @@ class App:
         if self.val1 == '' or self.val2 == '' or self.val3 == '' or self.val4 == '' or self.val5 == '' or self.val6 == '' or self.val7 == '':
             tkinter.messagebox.showwarning("Warning","Please fill up all the details")
         else:
-            # now we add to the database
-            sql = "INSERT INTO 'appointments' (name, age, gender, location, assigned_doctor, scheduled_time, phone) VALUES(?, ?, ?, ?, ?, ?)"
-            c.execute(sql, (self.val1, self.val2, self.val3, self.val4, self.val5, self.val6, self.val7))
-            conn.commit()
             tkinter.messagebox.showinfo("Success","Appointment for "+str(self.val1)+" has been created")
             
             self.box.insert(END, '\nAppointment fixed for ' + str(self.val1) + ' at ' + str(self.val5))
-
 
 #creating the object
 root = tk.Tk()

@@ -11,6 +11,8 @@ except ImportError:
 import sqlite3
 import tkinter.messagebox
 import os, sys, webbrowser, time
+from user_login import loginUser
+
 from PIL import Image, ImageTk
 from tkinter import ttk
 import smtplib, random, string, socket
@@ -53,11 +55,11 @@ class App:
         # button to login
         self.loginShield = PhotoImage(file = "resources/user-shield-100.png")
         self.buttonImage = self.loginShield.subsample(3, 3)
-        self.submit = Button(text = 'Login', image=self.buttonImage, compound=LEFT, width=120, height=40, bg='steelblue', command=self.login)
+        self.submit = Button(text = 'Login', image=self.buttonImage, compound=LEFT, width=120, height=40, bg='steelblue', command=self.loginInterface)
         self.submit.place(x=170, y=200)
 
     # function to login
-    def login(self):
+    def loginInterface(self):
         self.id = self.login_id_ent.get()
         self.password = self.password_ent.get()
         
@@ -66,25 +68,21 @@ class App:
         else:
             self.login_id_ent.delete(0, END)
             self.password_ent.delete(0, END)
-            sql = "SELECT * FROM credentials WHERE id LIKE ?"
-            self.input = str(self.id)
-            self.res = c.execute(sql, (self.input))
-            for self.row in self.res:
-                self.db_name = self.row[1]
-                self.db_pass = self.row[2]
-                self.db_designation = self.row[3]
 
-            self.db_name = 'Adib Shakib'
-            self.db_pass = 'cato17'
-            self.db_designation = 'Staff'
+            currentUser = loginUser( str(self.id), self.password)
 
-            self.drawWin()
+            if currentUser == "PW":
+                tkinter.messagebox.showerror("Login Unsuccessful", "Password Incorrect! Please login again")
 
-            # if self.db_pass == self.password:
-            #     tkinter.messagebox.showinfo("Login Successful", "Hello "+self.db_name+"! You have successfully logged in as " + self.db_designation)
-            #     self.drawWin()
-            # else:
-            #     tkinter.messagebox.showerror("Login Unsuccessful", "Invalid credentials! Please login again")
+            elif currentUser == "USR":
+                tkinter.messagebox.showerror("Login Unsuccessful", "Username not found! Please login again")
+
+            else:
+                self.db_name = currentUser.name
+                self.db_pass = currentUser.employee_id
+                self.db_designation = currentUser.classification
+                tkinter.messagebox.showinfo("Login Successful", "Hello "+ self.db_name + "! You have successfully logged in as " + self.db_designation.capitalize())
+                self.drawWin()
 
     #function to draw toplevel window
     def drawWin(self):
@@ -100,18 +98,24 @@ class App:
         Chooser = Menu()
         itemone = Menu()
 
-        if self.db_designation == 'Staff':
+        if self.db_designation == 'clerk':
             Chooser.add_command(label='Add Appointment', command=self.appointment)
             Chooser.add_command(label='Edit Appointment', command=self.update)
             Chooser.add_command(label='Delete Appointment', command=self.delete)
             Chooser.add_command(label='View Appointment', command=self.display)
+            Chooser.add_command(label='Check-In Patient', command=self.checkInPatient)
 
-        elif self.db_designation == 'Doctor':
+        elif self.db_designation == 'doctor':
             Chooser.add_command(label='View Appointment', command=self.display)
+            Chooser.add_command(label='View Patient Measurements', command=self.patientMeasurements)
             Chooser.add_command(label='Patient Chart', command=self.patient_chart)
         
-        elif self.db_designation == 'Nurse':
+        elif self.db_designation == 'nurse':
             Chooser.add_command(label='Patient Chart', command=self.patient_chart)
+            Chooser.add_command(label='Update Measurements', command=self.patientMeasurements)
+        
+        elif self.db_designation == 'ceo':
+            Chooser.add_command(label='View Report', command=self.view_report)
         
         Chooser.add_command(label='Logout', command=lambda: self.logout(top))
 
@@ -170,13 +174,19 @@ class App:
     def patient_chart(self):
         os.system("python patient_chart.py")
 
+    def view_report(self):
+        os.system("python view_report.py")
+
+    def checkInPatient(self):
+        os.system("python checkInPatient.py")
+
 root = tk.Tk()
 b = App(root)
 root.geometry("540x380+360+180")
 root.resizable(False, False)
 root.title("Hospital Managemnet Appointment Application - Login Window")
 root.iconphoto(False, tk.PhotoImage(file="resources/icon.png"))
-root.bind('<Return>', b.login)
+root.bind('<Return>', b.loginInterface)
 
 def hide_root():
     # Hide root window
