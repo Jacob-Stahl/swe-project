@@ -8,6 +8,14 @@ sshtunnel.SSH_TIMEOUT = 5.0
 sshtunnel.TUNNEL_TIMEOUT = 5.0
 
 
+# Basic function to add record, intended for Nurse
+def addRecord(patient_id, date, visit_reason, weight, height, blood_pressure):
+    record_id = genID(patient_id + date)
+    addRecordSQL = "INSERT INTO record (record_id, patient_id, date, visit_reason, weight, height, blood_pressure) \
+        VALUES ('" + record_id + "', '" + patient_id + "', '" + date + "', '" + visit_reason + "', '" + weight + "', '" + height + "', '" + blood_pressure + "');"
+    sendSQL(addRecordSQL)
+
+
 # Create a new appointment entry in DB
 # Includes preventative measures for duplicate entries
 def addAppointment(patient_name, patient_birthday, gender, date, time):
@@ -101,3 +109,29 @@ def genID(hashString):
     newID = newID[:10]
     return(newID)
     
+
+# Simple patient SQL query function for use wherever needed
+# Pass EITHER patient name OR patient id
+#   If you pass BOTH the function will return nothing
+#       because I'm too lazy to code a verification to make sure the name and id both match
+# If you leave outField == None, function will return all info on patient stored in table
+# Or, set outfield = field where field is a string that matches a parameter in the patient table
+#   This will return the single value needed for the patient specified
+def getPatientInfo(patient_name = None, patient_id = None, outField = None):
+    if patient_name == None and patient_id == None:
+        return
+    elif patient_name != None and patient_id != None:
+        return
+    if outField == None:
+        selectFieldTxt = "*"
+    else:
+        selectFieldTxt = outField
+    if patient_name == None:
+        whereFieldTxt1 = "patient_id"
+        whereFieldTxt2 = patient_id
+    else:
+        whereFieldTxt1 = "patient_name"
+        whereFieldTxt2 = patient_name
+    SQLTxt = "SELECT " + selectFieldTxt + " FROM patient WHERE " + whereFieldTxt1 + " = '" + whereFieldTxt2 + "';"
+    result = sendSQL(SQLTxt)
+    return result
