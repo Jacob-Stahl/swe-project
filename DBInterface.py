@@ -8,7 +8,45 @@ sshtunnel.SSH_TIMEOUT = 5.0
 sshtunnel.TUNNEL_TIMEOUT = 5.0
 
 
-# Basic function to add record, intended for Nurse
+# Function to add treatment and prescription to a record
+# can also overwrite treatment and prescription for a given record
+# Returns True if successful, False if not
+# For use by doctor after the nurse has already created a record
+# Provide record_id, patient_id, or both
+# If you provide neither, function will return False and won't do anything
+# If you provide both, the function will ensure that the record's patient_id matches the patient_id provided
+#   so providing both is slower than just providing one.
+# If you provide only a patient_id and the patient has multiple records, the latest record will be used
+def addTreatment(treatment, prescription, record_id = None, patient_id = None):
+    # code to make sure correct record is found
+    if record_id == None and patient_id == None:
+        # return if neither patient_id nor record_id were provided
+        return False
+    # If only record_id was provided
+    if patient_id == None:
+        record = record_id
+    # Get newest record og patient if only patient_id was provided
+    elif record_id == None:
+        patient = patient_id
+        record = sendSQL("SELECT record_id FROM record WHERE patient_id = '" + patient + "' ORDER BY date DESC;")[0]
+    # Make sure record_id and patient_id match if both record_id and patient_id were provided
+    else:
+        # try except blocks because I'm too lazy to debug edge cases
+        # when ids are correct it should work fine
+        try:
+            record = record_id
+            patient = patient_id
+            recordsPatient = sendSQL("SELECT patient_id FROM record WHERE record_id = '" + record_id + "';")[0]
+            if patient != recordsPatient:
+                return False
+        except:
+            return False
+    sendSQL("UPDATE record SET treatment = '" + treatment + "' WHERE record_id = '" + record + "';")
+    sendSQL("UPDATE record SET prescription = '" + prescription + "' WHERE record_id = '" + record + "';")
+    return True
+
+
+# Basic function to create a record, intended for Nurse
 def addRecord(patient_id, date, visit_reason, weight, height, blood_pressure):
     record_id = genID(patient_id + date)
     addRecordSQL = "INSERT INTO record (record_id, patient_id, date, visit_reason, weight, height, blood_pressure) \
@@ -78,6 +116,24 @@ def addPatient(name, birthday, gender = None, address = None, city = None, state
             patient_id = genID(patient_id)
     # Return patient id as confirmation
     return patient_id
+
+
+# Function to add address, contact info, insurance, etc to patient by patient_id
+# All values must be provided
+# Returns True if successful, False if not
+def addPatientInfo(patient_id, address, city, state, zip_code, phone_no, email, social, insurance):
+    patient_name = sendSQL("SELECT patient_name FROM patient WHERE patient_id = '" + patient_id + "';")
+    print(patient_name)
+    if patient_name != None:
+        try:
+            sendSQL("UPDATE patient SET address = '" + address + "', city = '" + city + "', state = '" + "', zip = " + str(zip_code) + \
+                ", phone_no = '" + phone_no + "', email = '" + email + "', social = '" + social + "', insurance = '" + insurance + "' \
+                    WHERE patient_id = '" + patient_id + "';")
+            return True
+        except:
+            return False
+    else:
+        return False
 
 
 # General function that sends mysql statement to remote database through ssh tunnel
