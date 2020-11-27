@@ -91,7 +91,7 @@ class App:
         self.submit.place(x=220, y=400)
 
     # function to call when the submit button is clicked
-    def add_appointment(self, event):
+    def add_appointment(self):
         # getting the user inputs
         self.val1 = self.patientName.get()
         self.val2 = self.age_ent.get()
