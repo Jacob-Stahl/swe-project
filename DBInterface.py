@@ -7,7 +7,6 @@ __name__ = 'DBInterface'
 sshtunnel.SSH_TIMEOUT = 5.0
 sshtunnel.TUNNEL_TIMEOUT = 5.0
 
-
 # Function to add treatment and prescription to a record
 # can also overwrite treatment and prescription for a given record
 # Returns True if successful, False if not

@@ -101,7 +101,7 @@ class App:
         self.submit.place(x=190, y=400)
 
     # Gets triggered when the submit button is clicked
-    def add_patient_chart(self, event):
+    def add_patient_chart(self):
         # getting the user inputs
         self.val1 = self.treatment_record.get()
         self.val2 = self.name_ent.get()

@@ -20,7 +20,8 @@ __name__ = 'user_login'
 #   username        password
 #   'testDoctor'     'softeng3365'
 #   'testNurse'      'softeng3365'
-#   'testClerk'      'softeng3365
+#   'testClerk'      'softeng3365'
+#   'testceo'        'softeng3365'
 
 
 # Function to login using hashed passwords in employee table on DB
