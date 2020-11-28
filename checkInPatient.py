@@ -22,7 +22,7 @@ class App:
         self.heading.place(x=180, y=40)
 
         # search criteria -->name 
-        self.name = Label(master, text="Enter Patient's Name", font=('arial 12'))
+        self.name = Label(master, text="Enter Patient's ID", font=('arial 12'))
         self.name.place(x=70, y=100)
 
         # entry for  the name
@@ -35,10 +35,11 @@ class App:
 
     # function to call when the submit button is clicked
     def search_db(self):
+        self.input = self.namenet.get()
 
-        patientName = self.namenet.get()
+        self.res = getAppointment(self.input)
 
-        if patientName:
+        if self.res != None:
             os.system("python addAdditionalInformation.py")
 
 #creating the object

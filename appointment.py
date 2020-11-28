@@ -9,8 +9,7 @@ except ImportError:
     import tkinter as tk
     
 import tkinter.messagebox
-from DBInterface import addTreatment
-from DBInterface import addAppointment
+from DBInterface import *
 
 # tkinter window
 class App:
@@ -45,7 +44,7 @@ class App:
         self.docName.place(x=65, y=220)
 
         # appointment date
-        self.appointmentDate = Label(self.left, text="Appointment Date", font=('arial 12'), fg='black', bg='lightblue')
+        self.appointmentDate = Label(self.left, text="Appointment Date (YYYY-MM-DD)", font=('arial 12'), fg='black', bg='lightblue')
         self.appointmentDate.place(x=65, y=260)
 
         # appointment time
@@ -53,11 +52,12 @@ class App:
         self.appointmentTime.place(x=65, y=300)
 
         # Enteries for all labels==============================================================
-        self.patientName = Entry(self.left, width=30)
-        self.patientName.place(x=275, y=100)
+
+        self.patientNameEntry = Entry(self.left, width=30)
+        self.patientNameEntry.place(x=350, y=100)
 
         self.age_ent = Entry(self.left, width=30)
-        self.age_ent.place(x=275, y=140)
+        self.age_ent.place(x=350, y=140)
 
         # gender list
         GenderList = ["Male", "Female", "Transgender"]
@@ -68,7 +68,7 @@ class App:
 
         self.opt = tk.OptionMenu(self.master, self.var, *GenderList)
         self.opt.config(width=10, font=('arial', 11))
-        self.opt.place(x=275, y=180)
+        self.opt.place(x=350, y=180)
 
         # callback method
         def callback(*args):
@@ -80,13 +80,13 @@ class App:
         self.var.trace("w", callback)
 
         self.doc_name_ent = Entry(self.left, width=30)
-        self.doc_name_ent.place(x=275, y=220)
+        self.doc_name_ent.place(x=350, y=220)
 
-        self.appointmentDate = Entry(self.left, width=30)
-        self.appointmentDate.place(x=275, y=260)
+        self.appointmentDateEntry = Entry(self.left, width=30)
+        self.appointmentDateEntry.place(x=350, y=260)
 
         self.time_ent = Entry(self.left, width=30)
-        self.time_ent.place(x=275, y=300)
+        self.time_ent.place(x=350, y=300)
 
         # button to perform a command
         self.submit = Button(self.left, text="Add Appointment", width=20, height=2, bg='steelblue', command=self.add_appointment)
@@ -95,23 +95,19 @@ class App:
     # function to call when the submit button is clicked
     def add_appointment(self):
         # getting the user inputs
-        self.val1 = self.patientName.get()
+        self.val1 = self.patientNameEntry.get()
         self.val2 = self.age_ent.get()
         self.val3 = self.gender_ent
-        self.val4 = self.location_ent.get()
-        self.val5 = self.time_ent.get()
-        self.val6 = self.phone_ent.get()
-        self.val7 = self.doc_name_ent.get()
-
-        addAppointment(patient_name, patient_birthday, gender, docName, date, time)
+        self.val4 = self.doc_name_ent.get()
+        self.val5 = self.appointmentDateEntry.get()
+        self.val6 = self.time_ent.get()
 
         # checking if the user input is empty
-        if self.val1 == '' or self.val2 == '' or self.val3 == '' or self.val4 == '' or self.val5 == '' or self.val6 == '' or self.val7 == '':
+        if self.val1 == '' or self.val2 == '' or self.val3 == '' or self.val4 == '' or self.val5 == '' or self.val6 == '':
             tkinter.messagebox.showwarning("Warning","Please fill up all the details")
         else:
-            tkinter.messagebox.showinfo("Success","Appointment for "+str(self.val1)+" has been created")
-            
-            self.box.insert(END, '\nAppointment fixed for ' + str(self.val1) + ' at ' + str(self.val5))
+            appointmentID = addAppointment(self.val1, self.val2, self.val3, self.val4, self.val5, self.val6)
+            tkinter.messagebox.showinfo('Appointment Successfully Created', 'Appointment fixed for ' + str(self.val1) + ' on ' + str(self.val5) +' at ' + str(self.val6) + ' and the appointment ID is: ' + str(appointmentID))
 
 #creating the object
 root = tk.Tk()

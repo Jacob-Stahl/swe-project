@@ -22,6 +22,7 @@ __name__ = 'user_login'
 #   'testNurse'      'softeng3365'
 #   'testClerk'      'softeng3365'
 #   'testceo'        'softeng3365'
+# Patient ID: 28edf3edc5, f7e57ea675
 
 
 # Function to login using hashed passwords in employee table on DB

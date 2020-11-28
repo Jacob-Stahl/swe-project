@@ -18,6 +18,7 @@ sshtunnel.TUNNEL_TIMEOUT = 5.0
 # If you provide both, the function will ensure that the record's patient_id matches the patient_id provided
 #   so providing both is slower than just providing one.
 # If you provide only a patient_id and the patient has multiple records, the latest record will be used
+
 def addTreatment(treatment, prescription, record_id = None, patient_id = None):
     # code to make sure correct record is found
     if record_id == None and patient_id == None:
@@ -236,7 +237,6 @@ def getEmployeeInfo(employee_name = None, username = None):
         SQLSearch = " SELECT name, username, employee_id, position FROM employee WHERE username = '" + username + "';"
         return sendSQL(SQLSearch)
     else: return None
-
 
 # get record from either patient_id or record_id
 # if patient_id only provided, will return patient's latest record

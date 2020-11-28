@@ -8,7 +8,6 @@ except ImportError:
     from tkinter import *
     import tkinter as tk
 
-import sqlite3
 import tkinter.messagebox
 import os, sys, webbrowser, time
 from user_login import loginUser
@@ -19,9 +18,6 @@ import smtplib, random, string, socket
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
-
-conn = sqlite3.connect('database.db')
-c = conn.cursor()
 
 class App:
     def __init__(self, master):
@@ -107,11 +103,11 @@ class App:
 
         elif self.db_designation == 'doctor':
             Chooser.add_command(label='View Appointment', command=self.display)
-            Chooser.add_command(label='View Patient Measurements', command=self.patientMeasurements)
-            Chooser.add_command(label='Patient Chart', command=self.patient_chart)
+            Chooser.add_command(label='View Patient Measurements', command=self.getRecord)
+            Chooser.add_command(label='Add Treatment', command=self.addTreatment)
         
         elif self.db_designation == 'nurse':
-            Chooser.add_command(label='Patient Chart', command=self.patient_chart)
+            Chooser.add_command(label='Add Records', command=self.addRecords)
             Chooser.add_command(label='Update Measurements', command=self.patientMeasurements)
         
         elif self.db_designation == 'ceo':
@@ -141,7 +137,7 @@ class App:
         self.Name = Label(self.right, text="Name: " + self.db_name, font=('arial 12'), fg='black')
         self.Name.place(x=5, y=50)
 
-        self.Name = Label(self.right, text="Designation: " + self.db_designation, font=('arial 12'), fg='black')
+        self.Name = Label(self.right, text="Designation: " + self.db_designation.capitalize(), font=('arial 12'), fg='black')
         self.Name.place(x=5, y=80)
 
     def destroyTop(self, top):
@@ -153,32 +149,33 @@ class App:
         if MsgBox == 'yes':
             self.destroyTop(top)
             show_root()
-
-    # function to open the appointment window    
+  
     def appointment(self):
         os.system("python appointment.py")
 
-    # function to open the update window  
     def update(self):
         os.system("python update.py")
 
-    # function to open the display window 
-    # may get modified or replaced in upcoming versions 
     def display(self):
         os.system("python display.py")
 
-    # function to open the display window  
     def delete(self):
         os.system("python delete.py")
 
-    def patient_chart(self):
-        os.system("python patient_chart.py")
+    def addTreatment(self):
+        os.system("python addTreatment.py")
 
     def view_report(self):
         os.system("python view_report.py")
 
     def checkInPatient(self):
         os.system("python checkInPatient.py")
+
+    def addRecords(self):
+        os.system("python addRecords.py")
+
+    def getRecord(self):
+        os.system("python getRecord.py")
 
 root = tk.Tk()
 b = App(root)
