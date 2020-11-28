@@ -3,7 +3,7 @@
   
 <h1>Hospital Management System Manual</h1>
 
-<h3>Dependencies<\3>
+<h3>Dependencies<\h3>
 python3
 	
 pip install:
