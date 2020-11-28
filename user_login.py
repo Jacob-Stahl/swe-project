@@ -17,11 +17,15 @@ __name__ = 'user_login'
 # User currentUser.classification to determine what menus to pull up on login
 
 #   Test logins:
+#
 #     Username            Password
+#
 #   'testDoctor'        'softeng3365'
 #   'testNurse'         'softeng3365'
 #   'testClerk'         'softeng3365'
 #   'testceo'           'softeng3365'
+
+# Dummy Logins
 #   Patient ID:          f7e57ea675
 #   Appointment ID:     4d4dfb3fb2, 75fda9d96e
 
