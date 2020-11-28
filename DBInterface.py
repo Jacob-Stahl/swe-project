@@ -107,7 +107,21 @@ def addAppointment(patient_name, patient_birthday, gender, docName, date, time):
     # Returns appointment ID if appointment scheduling was successful
     return apt_id
 
-    
+
+# Adds payment information to appointment table.
+# Returns True if successful
+# Returns False if not
+# 'amount' should be a float value, 'payment_type' is a string e.g. 'debit', 'credit', 'cash', etc
+def addPayment(appointment_id, amount, paymentType):
+    try:
+        SQLPay = "UPDATE appointment SET paid = " + str(amount) + " WHERE apt_id = '" + appointment_id + "';"
+        SQLPayment = "UPDATE appointment SET payment = '" + paymentType + "' WHERE apt_id = '" + appointment_id + "';"
+        sendSQL(SQLPay)
+        sendSQL(SQLPayment)
+        return True
+    except:
+        return False
+
 
 # Adds a new row to patient table in database
 # No preventative measures for duplicate entries
@@ -141,7 +155,6 @@ def addPatient(name, birthday, gender = None, address = None, city = None, state
 # Returns True if successful, False if not
 def addPatientInfo(patient_id, address, city, state, zip_code, phone_no, email, social, insurance):
     patient_name = sendSQL("SELECT patient_name FROM patient WHERE patient_id = '" + patient_id + "';")
-    print(patient_name)
     if patient_name != None:
         try:
             sendSQL("UPDATE patient SET address = '" + address + "', city = '" + city + "', state = '" + state + "', zip = " + str(zip_code) + \
@@ -155,7 +168,7 @@ def addPatientInfo(patient_id, address, city, state, zip_code, phone_no, email, 
 
 
 # General function that sends mysql statement to remote database through ssh tunnel
-def sendSQL(sqlString, createID = False):
+def sendSQL(sqlString, fetchAll = False):
     # login to ssh
     with sshtunnel.SSHTunnelForwarder(
         ('193.27.13.69', 4067),
@@ -171,7 +184,10 @@ def sendSQL(sqlString, createID = False):
         # send mysql statement & close connection
         with connection.cursor() as cursor:
             cursor.execute(sqlString)
-            result = cursor.fetchone()
+            if fetchAll == False:
+                result = cursor.fetchone()
+            elif fetchAll == True:
+                result = cursor.fetchall()
         connection.commit()
         connection.close()
     return result
@@ -211,7 +227,7 @@ def getPatientInfo(patient_name = None, patient_id = None, outField = None):
     return result
 
 
-
+# get employee data from either employee_name or from employee's username
 def getEmployeeInfo(employee_name = None, username = None):
     if username == None and employee_name != None:
         SQLSearch = "SELECT name, username, employee_id, position FROM employee WHERE name = '" + employee_name + "';"
@@ -220,3 +236,70 @@ def getEmployeeInfo(employee_name = None, username = None):
         SQLSearch = " SELECT name, username, employee_id, position FROM employee WHERE username = '" + username + "';"
         return sendSQL(SQLSearch)
     else: return None
+
+
+# get record from either patient_id or record_id
+# if patient_id only provided, will return patient's latest record
+# if both patient_id and record_id are provided, function defaults to record_id and ignores patient_id
+def getRecord(patient_id = None, record_id = None):
+    if patient_id == None and record_id == None:
+        return None
+    elif record_id == None:
+        SQLSearch = "SELECT * FROM record WHERE patient_id = '" + patient_id + "' ORDER BY date DESC;"
+        record = sendSQL(SQLSearch, fetchAll = True)
+        if record == None:
+            # patient not found
+            return "PNF"
+        else:
+            return record[0]
+    else:
+        SQLSearch = "SELECT * FROM record WHERE record_id = '" + record_id + "';"
+        record = sendSQL(SQLSearch)
+        if record == None:
+            # record not found
+            return "RNF"
+        else:
+            return record
+
+
+# get appointment information from either patient_id or appointment_id
+# if patient_id only provided, will return patient's latest appointment
+# if both patient_id and appointment_id are provided, function defaults to using appointment_id and ignores patient_id
+def getAppointment(patient_id = None, appointment_id = None):
+    if patient_id == None and appointment_id == None:
+        return None
+    elif appointment_id == None:
+        SQLSearch = "SELECT * FROM appointment WHERE patient_id = '" + patient_id + "' ORDER BY date DESC;"
+        appointment = sendSQL(SQLSearch, fetchAll = True)
+        if appointment == None:
+            # patient not found
+            return "PNF"
+        else:
+            return appointment[0]
+    else:
+        SQLSearch = "SELECT * FROM appointment WHERE appointment_id = '" + appointment_id + "';"
+        appointment = sendSQL(SQLSearch)
+        if appointment == None:
+            # appointment not found
+            return "ANF"
+        else:
+            return appointment
+
+
+# Lists all unique patient_ids
+def listPatients():
+    SQLSearch = "SELECT patient_id FROM patient;"
+    return sendSQL(SQLSearch, fetchAll = True)
+
+# Lists all doctors by name
+# Lists by id if listIDs == True
+def listDoctors(listIDs = False):
+    if listIDs == False:
+        SQLSearch = "SELECT name FROM employee WHERE position = 'doctor';"
+    else:
+        SQLSearch = "SELECT employee_id FROM employee WHERE position = 'doctor';"
+    return sendSQL(SQLSearch, fetchAll = True)
+
+
+def createReport(docName, date):
+    pass
