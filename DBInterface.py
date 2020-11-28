@@ -62,7 +62,7 @@ def addRecord(patient_id, date, visit_reason, weight, height, blood_pressure):
 #   "NAD" if docName provided references an employee that is not of classification "doctor"
 #   "DNF" if not doctor of name docName was found in database
 #   "AAE" if an appointment already exists for the specified date + time + doctor
-def addAppointment(patient_name, patient_birthday, gender, docName, date, time):
+def addAppointment(patient_name, patient_birthday, gender, docName, date, time, appointmentID = None):
     # Get doctor ID from docName
     docInfo = getEmployeeInfo(employee_name = docName)
     if docInfo != None:
@@ -76,7 +76,10 @@ def addAppointment(patient_name, patient_birthday, gender, docName, date, time):
         return "DNF"
     # Insert appointment
     successfulInsert = False
-    apt_id = genID(date + time + docID)
+    if appointmentID == None:
+        apt_id = genID(date + time + docID)
+    else:
+        apt_id = appointmentID
     # while loop avoids conflicting apt_id hashes
     while successfulInsert == False:
         try:
@@ -113,12 +116,16 @@ def addAppointment(patient_name, patient_birthday, gender, docName, date, time):
 # Returns True if successful
 # Returns False if not
 # 'amount' should be a float value, 'payment_type' is a string e.g. 'debit', 'credit', 'cash', etc
-def addPayment(appointment_id, amount, paymentType):
+def addPayment(appointment_id, amount, paymentType, card_no = None, nameOnCard = None, exp = None):
     try:
         SQLPay = "UPDATE appointment SET paid = " + str(amount) + " WHERE apt_id = '" + appointment_id + "';"
         SQLPayment = "UPDATE appointment SET payment = '" + paymentType + "' WHERE apt_id = '" + appointment_id + "';"
         sendSQL(SQLPay)
         sendSQL(SQLPayment)
+        if paymentType.lower() == 'credit' or paymentType.lower() == 'debit':
+            SQLCardInfo = "UPDATE appointment SET card_no = '" + str(card_no) + "', card_name = '" + nameOnCard + "', exp = '" + str(exp) \
+                + "' WHERE apt_id = '" + appointment_id + "';"
+            sendSQL(SQLCardInfo)
         return True
     except:
         return False
@@ -166,6 +173,67 @@ def addPatientInfo(patient_id, address, city, state, zip_code, phone_no, email, 
             return False
     else:
         return False
+
+
+# This function deletes an appointment from the database by appointment ID
+# Returns True if successful
+# Returns False if appointment was not found in database
+def deleteAppointment(apt_id):
+    appointment = getAppointment(appointment_id = apt_id)
+    if appointment == "ANF":
+        # appointment not found
+        return False
+    else:
+        delSQL = "DELETE FROM appointment WHERE apt_id = '" + apt_id + "';"
+        sendSQL(delSQL)
+        return True
+
+
+# This function will update any field in the appointment table
+# First parameter is the appointment_id, and any combination of the subsequent parameters can be provided and all will be updated
+# This function has to do a lot of weird stuff and interface with multiple tables, so it is slow
+# Most input cases have been provided, but I could not test all of them, so let me know if you find an input combination that doesn't work
+# return code "PNF" means patient provided was not found
+# return code "DNF" means doctor provided was not found
+def updateAppointment(appointment_id, patient_name = None, patient_birthday = None, gender = None, docName = None, date = None, time = None, ref_no = None):
+    # get patient_id from patient_name
+    if patient_name != None:
+        patient_id = getPatientInfo(patient_name = patient_name, outField = 'patient_id')
+        if patient_id != None:
+            patient_id = patient_id[0]
+        elif patient_birthday != None and gender != None:
+            patient_id = addPatient(patient_name, patient_birthday, gender = gender)
+        else:
+            # Patient not found
+            return "PNF"
+    else:
+        patient_id = None
+    # get doctor ID from docName
+    if docName != None:
+        docID = sendSQL("SELECT employee_id FROM employee WHERE position = 'doctor' AND name = '" + docName + "';")
+        if docID != None:
+            docID = docID[0]
+        else:
+            # doctor not found
+            return "DNF"
+    else:
+        docID = None
+    # Create new apt info array
+    newApt = [appointment_id, patient_id, patient_name, docID, date, time, None, None, None, None, None, ref_no]
+    ogApt = getAppointment(appointment_id = appointment_id)
+    updatedApt = []
+    for i in range(len(newApt)):
+        if str(newApt[i]) != str(ogApt[i]) and newApt[i] != None:
+            updatedApt.append(newApt[i])
+        else:
+            updatedApt.append(ogApt[i])
+    patientInfo = getPatientInfo(patient_id = updatedApt[1])
+    doctor_name = sendSQL("SELECT name FROM employee WHERE employee_id = '" + updatedApt[3] + "';")[0]
+    deleteAppointment(appointment_id)
+    addAppointment(updatedApt[2], str(patientInfo[2]), patientInfo[3], doctor_name, str(updatedApt[4]), str(updatedApt[5]), appointmentID = updatedApt[0])
+    if updatedApt[11] != None:
+        refSQL = "UPDATE appointment SET ref_no = '" + str(updatedApt[11]) + "' WHERE apt_id = '" + appointment_id + "';"
+        sendSQL(refSQL)
 
 
 # General function that sends mysql statement to remote database through ssh tunnel
@@ -277,13 +345,25 @@ def getAppointment(patient_id = None, appointment_id = None):
         else:
             return appointment[0]
     else:
-        SQLSearch = "SELECT * FROM appointment WHERE appointment_id = '" + appointment_id + "';"
+        SQLSearch = "SELECT * FROM appointment WHERE apt_id = '" + appointment_id + "';"
         appointment = sendSQL(SQLSearch)
         if appointment == None:
             # appointment not found
             return "ANF"
         else:
             return appointment
+
+
+# Function to getch billing report information from apt_id
+# returns tuple [amount, payment_type, card_no, name_on_card, expiration_date, ref_no]
+def getBilling(apt_id):
+    billSQL = "SELECT paid, payment, card_no, card_name, exp, ref_no FROM appointment WHERE apt_id = '" + apt_id + "';"
+    billingStatement = sendSQL(billSQL, fetchAll = True)
+    if billingStatement != None:
+        return billingStatement
+    else:
+        # appointment not found
+        return "ANF"
 
 
 # Lists all unique patient_ids
@@ -301,5 +381,23 @@ def listDoctors(listIDs = False):
     return sendSQL(SQLSearch, fetchAll = True)
 
 
+# Input doctor name and date to get report on that doctor for that day
+# returns a 4-value list:
+#   [docName, docID, no_of_appointments, revenue_earned]
 def createReport(docName, date):
-    pass
+    docID = sendSQL("SELECT employee_id FROM employee WHERE position = 'doctor' AND name = '" + docName + "';")
+    if docID != None:
+        docID = docID[0]
+    else:
+        # doctor not found
+        return "DNF"
+    aptList = sendSQL("SELECT apt_id FROM appointment WHERE doctor_id = '" + docID + "' AND date = '" + str(date) + "';", fetchAll = True)
+    no_of_apt = len(aptList)
+    paidList = []
+    for apt in aptList:
+        paidList.append(sendSQL("SELECT paid FROM appointment WHERE apt_id = '" + apt[0] + "';", fetchAll = True))
+    totalEarned = 0
+    for payment in paidList:
+        if payment != None:
+            totalEarned = totalEarned + payment[0][0]
+    return [docName, docID, no_of_apt, float(totalEarned)]
