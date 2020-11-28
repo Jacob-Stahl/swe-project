@@ -7,6 +7,8 @@ __name__ = 'DBInterface'
 sshtunnel.SSH_TIMEOUT = 5.0
 sshtunnel.TUNNEL_TIMEOUT = 5.0
 
+# NOTE: ALL 'date' entries MUST be formatted 'YYYY-MM-DD'
+
 # Function to add treatment and prescription to a record
 # can also overwrite treatment and prescription for a given record
 # Returns True if successful, False if not
@@ -55,9 +57,25 @@ def addRecord(patient_id, date, visit_reason, weight, height, blood_pressure):
 
 # Create a new appointment entry in DB
 # Includes preventative measures for duplicate entries
-def addAppointment(patient_name, patient_birthday, gender, date, time):
+# Failure return codes:
+#   "NAD" if docName provided references an employee that is not of classification "doctor"
+#   "DNF" if not doctor of name docName was found in database
+#   "AAE" if an appointment already exists for the specified date + time + doctor
+def addAppointment(patient_name, patient_birthday, gender, docName, date, time):
+    # Get doctor ID from docName
+    docInfo = getEmployeeInfo(employee_name = docName)
+    if docInfo != None:
+        if docInfo[3].lower() == 'doctor':
+            docID = docInfo[2]
+        else:
+            # Return code "NAD" if employee provided is not a doctor
+            return "NAD"
+    else:
+        # Return code "DNF" if doctor was not found in database
+        return "DNF"
+    # Insert appointment
     successfulInsert = False
-    apt_id = genID(date + time)
+    apt_id = genID(date + time + docID)
     # while loop avoids conflicting apt_id hashes
     while successfulInsert == False:
         try:
@@ -74,8 +92,8 @@ def addAppointment(patient_name, patient_birthday, gender, date, time):
             else:
                 raise LookupError('Multiple patients exist with provided name and birthday.')
             # Create SQL statement to add appointment to DB
-            addAppSQL = "INSERT INTO appointment (apt_id, patient_id, patient_name, date, time) \
-                VALUES ('" + apt_id + "', '" + patient_id + "', '" + patient_name + "', '" + date + "', '" + time + "');"
+            addAppSQL = "INSERT INTO appointment (apt_id, patient_id, patient_name, doctor_id, date, time) \
+                VALUES ('" + apt_id + "', '" + patient_id + "', '" + patient_name + "', '" + docID + "', '" + date + "', '" + time + "');"
             sendSQL(addAppSQL)
             successfulInsert = True
         # catches duplicate entries and conflicting hashes
@@ -84,8 +102,9 @@ def addAppointment(patient_name, patient_birthday, gender, date, time):
             if str(sendSQL("SELECT date FROM appointment WHERE apt_id = '" + apt_id + "';")[0]) != date:
                 apt_id = genID(apt_id)
             else:
-                # returns 'None' if appointment already exists for provided date and time
-                return None
+                # returns code "AAE" if appointment already exists for provided date and time
+                return "AAE"
+    # Returns appointment ID if appointment scheduling was successful
     return apt_id
 
     
@@ -125,7 +144,7 @@ def addPatientInfo(patient_id, address, city, state, zip_code, phone_no, email, 
     print(patient_name)
     if patient_name != None:
         try:
-            sendSQL("UPDATE patient SET address = '" + address + "', city = '" + city + "', state = '" + "', zip = " + str(zip_code) + \
+            sendSQL("UPDATE patient SET address = '" + address + "', city = '" + city + "', state = '" + state + "', zip = " + str(zip_code) + \
                 ", phone_no = '" + phone_no + "', email = '" + email + "', social = '" + social + "', insurance = '" + insurance + "' \
                     WHERE patient_id = '" + patient_id + "';")
             return True
@@ -190,3 +209,14 @@ def getPatientInfo(patient_name = None, patient_id = None, outField = None):
     SQLTxt = "SELECT " + selectFieldTxt + " FROM patient WHERE " + whereFieldTxt1 + " = '" + whereFieldTxt2 + "';"
     result = sendSQL(SQLTxt)
     return result
+
+
+
+def getEmployeeInfo(employee_name = None, username = None):
+    if username == None and employee_name != None:
+        SQLSearch = "SELECT name, username, employee_id, position FROM employee WHERE name = '" + employee_name + "';"
+        return sendSQL(SQLSearch)
+    elif employee_name == None:
+        SQLSearch = " SELECT name, username, employee_id, position FROM employee WHERE username = '" + username + "';"
+        return sendSQL(SQLSearch)
+    else: return None

@@ -10,6 +10,7 @@ except ImportError:
     
 import tkinter.messagebox
 from DBInterface import addTreatment
+from DBInterface import addAppointment
 
 # tkinter window
 class App:
@@ -102,7 +103,7 @@ class App:
         self.val6 = self.phone_ent.get()
         self.val7 = self.doc_name_ent.get()
 
-        addAppointment(patient_name, patient_birthday, gender, date, time)
+        addAppointment(patient_name, patient_birthday, gender, docName, date, time)
 
         # checking if the user input is empty
         if self.val1 == '' or self.val2 == '' or self.val3 == '' or self.val4 == '' or self.val5 == '' or self.val6 == '' or self.val7 == '':
