@@ -19,7 +19,7 @@ class App:
         self.heading.place(x=180, y=40)
 
         # search criteria -->name 
-        self.name = Label(master, text="Enter Patient's ID", font=('arial 12'))
+        self.name = Label(master, text="Enter Appointment ID", font=('arial 12'))
         self.name.place(x=70, y=100)
 
         # entry for  the name
@@ -29,7 +29,6 @@ class App:
         # search button
         self.search = Button(master, text="Search", width=12, height=1, bg='steelblue', command=self.search_db)
         self.search.place(x=230, y=150)
-    
     
     # function to search
     def search_db(self):
@@ -111,9 +110,10 @@ class App:
     
     def delete_db(self):
         if tkinter.messagebox.askyesno("Are you sure?", "Delete record of "+self.patient_name+"?"):
-            # DeleteAppointment function
-
-            tkinter.messagebox.showinfo("Success", "Deleted Successfully")
+            if deleteAppointment(self.input):
+                tkinter.messagebox.showinfo("Success", "Deleted Successfully")
+            else:
+                tkinter.messagebox.showerror("Failed", "Appointment does not exist in the database")
 
 #creating the object
 root = tk.Tk()

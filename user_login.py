@@ -16,13 +16,14 @@ __name__ = 'user_login'
 #   currentUser.classification: employee position, either 'doctor', 'nurse', or 'clerk'
 # User currentUser.classification to determine what menus to pull up on login
 
-# Test logins:
-#   username        password
-#   'testDoctor'     'softeng3365'
-#   'testNurse'      'softeng3365'
-#   'testClerk'      'softeng3365'
-#   'testceo'        'softeng3365'
-# Patient ID: 28edf3edc5, f7e57ea675
+#   Test logins:
+#     Username            Password
+#   'testDoctor'        'softeng3365'
+#   'testNurse'         'softeng3365'
+#   'testClerk'         'softeng3365'
+#   'testceo'           'softeng3365'
+#   Patient ID:          f7e57ea675
+#   Appointment ID:     4d4dfb3fb2, 75fda9d96e
 
 
 # Function to login using hashed passwords in employee table on DB

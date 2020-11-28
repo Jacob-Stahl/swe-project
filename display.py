@@ -91,7 +91,6 @@ class App:
         def callback(*args):
             for i in range(len(GenderList)):
                 if GenderList[i] == self.var.get():
-                    # print(GenderList[i])
                     self.gender = GenderList[i]
                     break
 

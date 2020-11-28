@@ -20,7 +20,7 @@ class App:
         self.heading.place(x=180, y=40)
 
         # search criteria -->name 
-        self.name = Label(master, text="Enter Patient's ID", font=('arial 12'))
+        self.name = Label(master, text="Enter Appointments ID", font=('arial 12'))
         self.name.place(x=70, y=100)
 
         # entry for  the name
@@ -118,8 +118,14 @@ class App:
         self.var5 = self.ent5.get()     #updated date
         self.var6 = self.ent6.get()     #updated time
 
-        # UpdateAppointment function
-        tkinter.messagebox.showinfo("Updated", "Successfully Updated.")
+        updateApp = updateAppointment(self.input, self.var1, self.var2, self.var3, self.var4, self.var5, self.var6, ref_no = None)
+
+        if updateApp == "PNF":
+            tkinter.messagebox.showerror("Failed", "Patient provided was not found")
+        elif updateApp == "DNF":
+            tkinter.messagebox.showerror("Failed", "Doctor provided was not found")
+        else:
+            tkinter.messagebox.showinfo("Updated", "Successfully Updated.")
 
 #creating the object
 root = tk.Tk()

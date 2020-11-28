@@ -107,6 +107,7 @@ class App:
             Chooser.add_command(label='Add Treatment', command=self.addTreatment)
         
         elif self.db_designation == 'nurse':
+            Chooser.add_command(label='View Appointment', command=self.display)
             Chooser.add_command(label='Update Measurements', command=self.addRecords)
         
         elif self.db_designation == 'ceo':
