@@ -87,7 +87,16 @@ class App:
         letters_and_digits = string.ascii_letters + string.digits
         referenceNumber = ''.join((random.choice(letters_and_digits) for i in range(32)))
 
-        tkinter.messagebox.showinfo("Reference Number: ", referenceNumber)
+        self.receipt = """
+            Reference_Number:
+            {}
+            
+            Card_Number:     {}
+            Name:            {}
+            Amount:         ${}
+        """.format(referenceNumber, self.cardNumber.get(), self.NameOnCard.get(), self.paymentAmount.get())
+
+        tkinter.messagebox.showinfo("Reciept and Reference number", self.receipt)
 
 #creating the object
 root = tk.Tk()
