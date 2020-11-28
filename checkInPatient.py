@@ -11,6 +11,7 @@ except ImportError:
     
 import tkinter.messagebox
 import os, sys, webbrowser, time
+from DBInterface import *
 
 # tkinter window
 class App:

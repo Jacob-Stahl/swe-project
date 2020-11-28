@@ -10,9 +10,8 @@ except ImportError:
     import tkinter as tk
     
 import tkinter.messagebox
-import os
-import random
-import string
+import os, random, string
+from DBInterface import *
 
 # tkinter window
 class App:
@@ -31,8 +30,8 @@ class App:
 
         # Payment Type
 
-        self.gender = Label(self.left, text="Payment Type", font=('arial 12'), fg='black', bg='lightblue')
-        self.gender.place(x=65, y=100)
+        self.paymentType = Label(self.left, text="Payment Type", font=('arial 12'), fg='black', bg='lightblue')
+        self.paymentType.place(x=65, y=100)
 
         # cardNumber
         self.cardNumber = Label(self.left, text="Card Number", font=('arial 12'), fg='black', bg='lightblue')

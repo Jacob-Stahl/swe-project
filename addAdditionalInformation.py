@@ -10,6 +10,7 @@ except ImportError:
     
 import tkinter.messagebox
 import os, time
+from DBInterface import *
 
 # tkinter window
 class App:
