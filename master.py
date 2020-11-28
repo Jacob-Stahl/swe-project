@@ -12,7 +12,7 @@ import tkinter.messagebox
 import os, sys, webbrowser, time
 from user_login import loginUser
 
-from PIL import Image, ImageTk
+from PIL import Image
 from tkinter import ttk
 import smtplib, random, string, socket
 from email.mime.text import MIMEText
@@ -107,8 +107,7 @@ class App:
             Chooser.add_command(label='Add Treatment', command=self.addTreatment)
         
         elif self.db_designation == 'nurse':
-            Chooser.add_command(label='Add Records', command=self.addRecords)
-            Chooser.add_command(label='Update Measurements', command=self.patientMeasurements)
+            Chooser.add_command(label='Update Measurements', command=self.addRecords)
         
         elif self.db_designation == 'ceo':
             Chooser.add_command(label='View Report', command=self.view_report)
@@ -172,7 +171,7 @@ class App:
         os.system("python checkInPatient.py")
 
     def addRecords(self):
-        os.system("python addRecords.py")
+        os.system("python addRecord.py")
 
     def getRecord(self):
         os.system("python getRecord.py")
