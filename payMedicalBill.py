@@ -29,7 +29,6 @@ class App:
         self.heading.place(x=160, y=50)
 
         # Payment Type
-
         self.paymentType = Label(self.left, text="Payment Type", font=('arial 12'), fg='black', bg='lightblue')
         self.paymentType.place(x=65, y=100)
 
@@ -57,7 +56,13 @@ class App:
         self.ExpirationDate = Entry(self.left, width=30)
         self.ExpirationDate.place(x=275, y=240)
 
-        # gender list
+        # appointment date
+        self.PatientID = Label(self.left, text="PatientID", font=('arial 12'), fg='black', bg='lightblue')
+        self.PatientID.place(x=65, y=260)
+        self.PatientID = Entry(self.left, width=30)
+        self.PatientID.place(x=275, y=260)
+
+        # card list
         CardList = ["Debit", "Credit"]
 
         # Option menu
@@ -86,15 +91,23 @@ class App:
 
         letters_and_digits = string.ascii_letters + string.digits
         referenceNumber = ''.join((random.choice(letters_and_digits) for i in range(32)))
-
+        paymentType = "debit" if self.cardEntry == 0 else "credit"
         self.receipt = """
+            Patient ID: {}
+            Name: {}
+            Date: {}
+            Amount: ${}
+            Payment Type: {}
             Reference_Number:
             {}
-            
-            Card_Number:     {}
-            Name:            {}
-            Amount:         ${}
-        """.format(referenceNumber, self.cardNumber.get(), self.NameOnCard.get(), self.paymentAmount.get())
+        """.format(
+            self.PatientID.get(),
+            self.NameOnCard.get(),
+            self.ExpirationDate.get(),
+            self.paymentAmount.get(),
+            paymentType,
+            referenceNumber,
+        )
 
         tkinter.messagebox.showinfo("Reciept and Reference number", self.receipt)
 
