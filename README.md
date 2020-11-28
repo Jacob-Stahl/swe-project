@@ -3,10 +3,18 @@
   
 <h1>Hospital Management System Manual</h1>
 
-  
+<h3>Dependencies<\3>
+python3
+	
+pip install:
+	pymysql
+	sshtunnel
+	hashlib
+	tkinter
+	smtplib
+	socket
+	
 Run master.py to login. You will login as 1 of 4 kinds of staff
-
-  
 
 <ul>
 	<li>Clerk<ul>
