@@ -110,7 +110,7 @@ class App:
             Chooser.add_command(label='View Appointment', command=self.display)
             Chooser.add_command(label='Update Measurements', command=self.addRecords)
         
-        elif self.db_designation == 'ceo':
+        elif self.db_designation == 'CEO':
             Chooser.add_command(label='View Report', command=self.view_report)
         
         Chooser.add_command(label='Logout', command=lambda: self.logout(top))

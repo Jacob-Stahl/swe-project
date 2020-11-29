@@ -23,65 +23,61 @@ class App:
         self.heading.place(x=180, y=40)
 
         # search by name 
-        self.name = Label(master, text="Enter Patient's ID", font=('arial 12'))
+        self.name = Label(master, text="Enter Doctor's Name", font=('arial 12'))
         self.name.place(x=70, y=100)
-
-        # entry for the name
         self.namenet = Entry(master, width=30)
         self.namenet.place(x=300, y=100)
 
+        self.date = Label(master, text="Enter Date", font=('arial 12'))
+        self.date.place(x=70, y=140)
+        self.datenet = Entry(master, width=30)
+        self.datenet.place(x=300, y=140)
+
         # search button
         self.search = Button(master, text="Enter", width=12, height=1, bg='steelblue', command=self.search_db)
-        self.search.place(x=230, y=150)
+        self.search.place(x=230, y=180)
     
     # Searches the database
     def search_db(self):
-        self.input = self.namenet.get()
+        self.val1 = self.namenet.get()
+        self.val2 = self.datenet.get()
 
-        self.res = getAppointment(self.input)
+        self.res = createReport(self.val1, self.val2)
 
-        self.patient_name = self.res[0]
-        self.patient_birthday = self.res[1]
-        self.gender = self.res[2]
-        self.docName = self.res[3]
-        self.date = str(self.res[4])
-        self.time = str(self.res[5])
+        self.docName = self.res[0]
+        self.docID = self.res[1]
+        self.no_of_appointments = self.res[2]
+        self.revenue_earned = self.res[3]
         
         # creating the update form
-        self.uname = Label(self.master, text="Patient's Name", font=('arial 12'))
+        self.uname = Label(self.master, text="Doctor's Name", font=('arial 12'))
         self.uname.place(x=70, y=220)
-
-        self.uage = Label(self.master, text="Age", font=('arial 12'))
-        self.uage.place(x=70, y=260)
-
-        self.ulocation = Label(self.master, text="Doctor Name", font=('arial 12'))
-        self.ulocation.place(x=70, y=340)
-
-        self.utime = Label(self.master, text="Appointment Date (YYYY-MM-DD)", font=('arial 12'))
-        self.utime.place(x=70, y=380)
-
-        self.uphone = Label(self.master, text="Appointment Time (HH:MM)", font=('arial 12'))
-        self.uphone.place(x=70, y=420)
 
         self.ent1 = Entry(self.master, width=30)
         self.ent1.place(x=300, y=220)
-        self.ent1.insert(END, str(self.patient_name))
+        self.ent1.insert(END, str(self.docName))
+
+        self.udocID = Label(self.master, text="Doctor's ID", font=('arial 12'))
+        self.udocID.place(x=70, y=260)
 
         self.ent2 = Entry(self.master, width=30)
         self.ent2.place(x=300, y=260)
-        self.ent2.insert(END, str(self.patient_birthday))
+        self.ent2.insert(END, str(self.docID))
+
+        self.uno_of_appointments = Label(self.master, text="No of Appointments", font=('arial 12'))
+        self.uno_of_appointments.place(x=70, y=300)
+
 
         self.ent4 = Entry(self.master, width=30)
-        self.ent4.place(x=300, y=340)
-        self.ent4.insert(END, str(self.docName))
+        self.ent4.place(x=300, y=300)
+        self.ent4.insert(END, str(self.no_of_appointments))
+
+        self.urevenue_earned = Label(self.master, text="Revenue Earned", font=('arial 12'))
+        self.urevenue_earned.place(x=70, y=340)
 
         self.ent5 = Entry(self.master, width=30)
-        self.ent5.place(x=300, y=380)
-        self.ent5.insert(END, str(self.date))
-
-        self.ent6 = Entry(self.master, width=30)
-        self.ent6.place(x=300, y=420)
-        self.ent6.insert(END, str(self.time))
+        self.ent5.place(x=300, y=340)
+        self.ent5.insert(END, str(self.revenue_earned))
 
 root = Tk()
 b = App(root)
