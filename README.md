@@ -3,16 +3,31 @@
   
 <h1>Hospital Management System Manual</h1>
 
-<h3>Dependencies<\h3>
+Dependencies:
 python3
-	
 pip install:
-	pymysql
-	sshtunnel
-	hashlib
-	tkinter
-	smtplib
-	socket
+<ul>
+	<li>pymysql</li>
+	<li>sshtunnel</li>
+	<li>hashlib</li>
+	<li>tkinter</li>
+	<li>smtplib</li>
+	<li>socket</li>
+</ul>
+Test logins
+<ul>
+	<li>Username            Password</li>
+	<li>testDoctor          softeng3365</li>
+	<li>testNurse           softeng3365</li>
+	<li>testClerk           softeng3365</li>
+	<li>testceo             softeng3365</li>
+</ul>
+Dummy Logins
+<ul>
+	<li>Patient ID:          f7e57ea675</li>
+	<li>Appointment ID:     4d4dfb3fb2, 75fda9d96e</li>
+</ul>
+
 	
 Run master.py to login. You will login as 1 of 4 kinds of staff
 
